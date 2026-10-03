@@ -4,14 +4,19 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ImagePreprocessor {
 
     static {
-        System.load("C:\\Users\\MONICA G\\Downloads\\opencv\\build\\java\\x64\\opencv_java4120.dll");
+        nu.pattern.OpenCV.loadLocally();
     }
+
+    // rest of your code...
 
     public static String preprocess(String inputImage) {
 
@@ -28,7 +33,7 @@ public class ImagePreprocessor {
         Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY);
 
         Mat blur = new Mat();
-        Imgproc.GaussianBlur(gray, blur, new Size(3,3), 0);
+        Imgproc.GaussianBlur(gray, blur, new Size(3, 3), 0);
 
         Mat threshold = new Mat();
         Imgproc.adaptiveThreshold(
@@ -43,14 +48,24 @@ public class ImagePreprocessor {
 
         Mat kernel = Imgproc.getStructuringElement(
                 Imgproc.MORPH_RECT,
-                new Size(2,2)
+                new Size(2, 2)
         );
 
         Mat opening = new Mat();
-        Imgproc.morphologyEx(threshold, opening, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(
+                threshold,
+                opening,
+                Imgproc.MORPH_OPEN,
+                kernel
+        );
 
         Mat closing = new Mat();
-        Imgproc.morphologyEx(opening, closing, Imgproc.MORPH_CLOSE, kernel);
+        Imgproc.morphologyEx(
+                opening,
+                closing,
+                Imgproc.MORPH_CLOSE,
+                kernel
+        );
 
         Mat edges = new Mat();
         Imgproc.Canny(closing, edges, 50, 150);
@@ -88,14 +103,26 @@ public class ImagePreprocessor {
             Imgproc.rectangle(
                     result,
                     largestRect,
-                    new Scalar(0,0,255),
+                    new Scalar(0, 0, 255),
                     3
             );
 
             System.out.println("Largest Area : " + maxArea);
         }
 
-        String output = "C:\\Users\\MONICA G\\IdeaProjects\\ProxyVisionOCR\\Images\\screen_detected.png";
+        // Create output path relative to the project.
+        Path outputPath = Paths.get(
+                "Images",
+                "screen_detected.png"
+        );
+
+        try {
+            Files.createDirectories(outputPath.getParent());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String output = outputPath.toString();
 
         Imgcodecs.imwrite(output, result);
 

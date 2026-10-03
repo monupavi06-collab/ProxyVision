@@ -11,7 +11,7 @@ public class OCRTest {
 
         ITesseract tesseract = new Tesseract();
 
-        tesseract.setDatapath("C:\\Users\\MONICA G\\AppData\\Local\\Programs\\Tesseract-OCR\\tessdata");
+        tesseract.setDatapath("/opt/homebrew/Cellar/tesseract/5.5.3/share/tessdata");
 
         tesseract.setLanguage("eng");
         tesseract.setPageSegMode(6);
@@ -26,7 +26,7 @@ public class OCRTest {
             text = text.replaceAll("\\s+", " ").trim();
             text = text.toLowerCase();
             String instruction = DecisionEngine.decide(text);
-
+            SpeechService.speak(instruction);
             System.out.println("\nDetected Text:");
             System.out.println(text);
 
